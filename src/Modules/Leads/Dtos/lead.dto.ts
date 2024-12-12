@@ -268,3 +268,19 @@ export class LeadFilterDto {
   @IsString()
   feedback?: string;
 }
+
+export class leadDemoDto{
+  teacherId:number
+demo_date:Date
+}
+
+export class leadTeacherSelectionDto{
+  teacherId:number
+teaching_start_time:string
+teaching_end_time:string
+}
+
+export class leadTeachingStatusDto{
+  teacherId:number
+
+}

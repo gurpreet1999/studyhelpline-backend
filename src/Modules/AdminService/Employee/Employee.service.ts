@@ -11,7 +11,7 @@ import { User } from 'src/TypeOrm/Entities/User/User.entities';
 import { TeacherCreatedByEmployeeDto } from '../Dtos/createTeacher.dto';
 import { TeacherService } from 'src/Modules/TeacherService/Teacher.service';
 import { LeadService } from 'src/Modules/Leads/Lead.service';
-import { CreateLeadDto, UpdateTeacherLeadActivityDto } from 'src/Modules/Leads/Dtos/lead.dto';
+import { CloseLeadDto, CreateLeadDto, leadDemoDto, leadTeacherSelectionDto, leadTeachingStatusDto, UpdateTeacherLeadActivityDto } from 'src/Modules/Leads/Dtos/lead.dto';
 import { EmployeeProfile } from '../Entity/employee.entities';
 
 
@@ -116,6 +116,14 @@ this.leadService.createLead(lead,employee)
      }
 
 
+
+     async closeLead(id:number,data:CloseLeadDto){
+    
+      return await this.leadService.closeLead(id,data)
+
+     }
+
+
 async findEmployeeById(id:number){
 
   try {
@@ -151,4 +159,20 @@ async updateLead(updateLead:UpdateTeacherLeadActivityDto){
   private generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
+
+
+async updateDemo(id:number , data:leadDemoDto){
+
+return await this.leadService.updateLeadDemoAssignment(id,data)
+
+}
+
+async updateTeacherSelected(id:number , data:leadTeacherSelectionDto){
+  return await this.leadService.updateLeadTeacherSelection(id,data)
+}
+
+async updateLeadTeachingStatus(id:number , data:leadTeachingStatusDto){
+  return await this.leadService.updateLeadTeachingStatus(id,data)
+}
+
 }

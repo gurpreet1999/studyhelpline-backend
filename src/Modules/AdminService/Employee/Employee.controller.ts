@@ -3,7 +3,7 @@ import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 
 import { EmployeeService } from "./Employee.service";
 import { TeacherCreatedByEmployeeDto } from "../Dtos/createTeacher.dto";
-import { CreateLeadDto, UpdateTeacherLeadActivityDto } from "src/Modules/Leads/Dtos/lead.dto";
+import { CloseLeadDto, CreateLeadDto, leadDemoDto, leadTeacherSelectionDto, leadTeachingStatusDto, UpdateTeacherLeadActivityDto } from "src/Modules/Leads/Dtos/lead.dto";
 
 
 
@@ -42,21 +42,45 @@ async createLead(@Body() lead:CreateLeadDto , @Param('id') id:number){
 
 
 
-@Get('/lead')
-async  AllLeadCreatedByEmployee(id:number){
-    this.employeeService.AllLeadByEmployee(id)
+@Get('/:id/lead')
+async  AllLeadCreatedByEmployee(@Param('id') id:number){
+    return this.employeeService.AllLeadByEmployee(id)
 }
 
-@Get('/lead/:id')
-async leadById(id:number){
+
+
+@Get('/:id/lead/:leadid')
+async leadById( @Param('leadid')  id:number){
     this.employeeService.leadById(id)
 }
 
-@Put('/lead/:id')
-async updateLead(lead:UpdateTeacherLeadActivityDto){
-    this.employeeService.updateLead(lead)
+
+
+@Put('/lead/:leadid')
+async closeLead( @Param('leadid') id:number , @Body() data:CloseLeadDto){
+    this.employeeService.closeLead(id,data)
 }
 
+
+
+@Put('/lead/:leadid/demo')
+async updateDemo(@Param('leadid') id:number , @Body() data:leadDemoDto){
+
+
+return this.employeeService.updateDemo(id,data)
+
+}
+
+@Put('/lead/:leadid/demo')
+async updateTeacherSelected(@Param('leadid') id:number , @Body() data:leadTeacherSelectionDto){
+    return this.employeeService.updateTeacherSelected(id,data)
+}
+
+@Put('/lead/:leadid/demo')
+async updateLeadTeachingStatus(@Param('leadid') id:number , @Body() data:leadTeachingStatusDto){
+    return this.employeeService.updateLeadTeachingStatus(id,data)
+
+}
 
 
 

@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/commo
 import { InjectRepository } from "@nestjs/typeorm";
 import { Lead, TeacherLeadActivity, TeacherLeadActivityLog,} from "src/TypeOrm/Entities/lead/lead.entities";
 import { Repository } from "typeorm";
-import { CloseLeadDto, CreateLeadDto,  RejectLeadDto, UpdateLeadPriceDto, UpdateTeacherLeadActivityDto } from "./Dtos/lead.dto";
+import { CloseLeadDto, CreateLeadDto,  leadDemoDto,  leadTeacherSelectionDto,  leadTeachingStatusDto,  RejectLeadDto, UpdateLeadPriceDto, UpdateTeacherLeadActivityDto } from "./Dtos/lead.dto";
 import { ClassLevel, Subject } from "src/TypeOrm/Entities/Subject&Class/Subject.entities";
 import { AvailabilityDays, AvailabilityTime } from "src/TypeOrm/Entities/AvailabilityDay&Time/Availability.entities";
 import { TeacherProfile } from "../TeacherService/Entity/teacher.entities";
@@ -518,20 +518,20 @@ async LeadByEmployeeId(employeeId:number){
 
 
 
-async updateLeadDemoAssignment(leadId:number,teacherId:number,   updateLeadDto:UpdateTeacherLeadActivityDto){
+async updateLeadDemoAssignment(leadId:number,  data:leadDemoDto){
 
   const activity = await this.teacherLeadActivityRepository.findOne({  });
 
   if (!activity) {
     throw new NotFoundException(`Teacher Lead Activity with ID  not found`);
   }
-  activity.demo_date=updateLeadDto.demo_date
+  activity.demo_date=data.demo_date
   activity.activityType=ActivityType.SELECTED_FOR_DEMO
 
   await this.teacherLeadActivityRepository.save(activity)
 
 
-  const teacher=await this.teacherService.fetchIndividualTeacher(teacherId)
+  const teacher=await this.teacherService.fetchIndividualTeacher(data.teacherId)
 const log=new TeacherLeadActivityLog()
 const logMessage = `Teacher ${teacher.user.first_name} ${teacher.user.last_name} has been assigned for a demo on ${activity.demo_date.toLocaleDateString()}.`;
 
@@ -541,28 +541,28 @@ await this.teacherLeadActivityLogsRepository.save(log);
 
 }
 
-async updateLeadTeacherSelection(leadId:number,teacherId:number,   updateLeadDto:UpdateTeacherLeadActivityDto){
+async updateLeadTeacherSelection(leadId:number,  data:leadTeacherSelectionDto){
   const activity = await this.teacherLeadActivityRepository.findOne({  });
 
   if (!activity) {
     throw new NotFoundException(`Teacher Lead Activity with ID  not found`);
   }
   activity.isTeacherSelected=true
-  activity.teaching_start_time=updateLeadDto.teaching_start_time
-  activity.teaching_end_time=updateLeadDto.teaching_end_time
+  activity.teaching_start_time=data.teaching_start_time
+  activity.teaching_end_time=data.teaching_end_time
 
   await this.teacherLeadActivityRepository.save(activity)
 
-  const teacher=await this.teacherService.fetchIndividualTeacher(teacherId)
+  const teacher=await this.teacherService.fetchIndividualTeacher(data.teacherId)
 const log=new TeacherLeadActivityLog()
-const logMessage = `Teacher ${teacher.user.first_name} ${teacher.user.last_name} has been selected for a classes  timing are -${updateLeadDto.teaching_start_time } - ${updateLeadDto.teaching_end_time}.`;
+const logMessage = `Teacher ${teacher.user.first_name} ${teacher.user.last_name} has been selected for a classes  timing are -${data.teaching_start_time } - ${data.teaching_end_time}.`;
 
 log.teacher_lead_activity = activity; 
 log.message = logMessage;
 await this.teacherLeadActivityLogsRepository.save(log);
 }
 
-async updateLeadTeachingStatus(leadId:number,teacherId:number,   updateLeadDto:UpdateTeacherLeadActivityDto){
+async updateLeadTeachingStatus(leadId:number,  data:leadTeachingStatusDto){
 
   const activity = await this.teacherLeadActivityRepository.findOne({  });
 
@@ -577,7 +577,7 @@ await this.teacherLeadActivityRepository.save(activity)
 
 const lead=await this.leadRepository.findOne({where:{id:leadId}});
 
-const teacher=await this.teacherService.fetchIndividualTeacher(teacherId)
+const teacher=await this.teacherService.fetchIndividualTeacher(data.teacherId)
 
  lead.selectedTutor=teacher
 
@@ -599,16 +599,13 @@ async closeLead(id:number, closeLeadDto:CloseLeadDto){
 
     lead.status=closeLeadDto.status
    lead.rejectionReason=closeLeadDto.reason
+   lead.isLeadClosed=true
 
     await this.leadRepository.save(lead);
     return lead;
 
 }
 
-
-async updateLead(){
-
-}
 
 
 async getLeadActivityLogs(leadId: number) {
